@@ -1,0 +1,773 @@
+<html lang="en" class="html">
+
+<head>
+
+    <audio id="myAudio" src="switchSound.wav" preload="auto"></audio>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css" id="tts-styles"></style>
+    <script type="text/javascript" src="jquery-3.7.1.js"></script>
+    <script src="https://weatherpoint.com.au/widget/loader.js?id=rydoty" async=""></script>
+    <script type="text/javascript">
+        const audio = document.getElementById('myAudio');
+
+        document.addEventListener('DOMContentLoaded', onDocumentReady);
+
+        function fetchReadings() {
+            fetch('/readings')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('The network response maybe incorrectly configured\nor may have connectivity issues!');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Temperature:', data.temperature);
+                    console.log('Humidity:', data.humidity);
+                    document.getElementById('temperature').innerText = data.temperature.toFixed(1) + ' °C';
+                    document.getElementById('humidity').innerText = data.humidity.toFixed(1) + ' %';
+
+                    // Check temperature and control fan/heater
+                    checkTemperature(data.temperature);
+                })
+                .catch(error => {
+                    console.error('Error fetching readings:', error);
+                });
+        }
+        /* commented out functions for checking climate and activating or 
+            deactivating either heater or fan depending on temperature response values
+          function checkTemperature(temperature) {
+            if (temperature > 24.00) {
+                // If temperature is above 24°C, turn on the fan and turn off the heater
+                handleButtonClick('button5', '/fan', 'fan'); // Fan ON
+                disableHeater();
+            } else {
+                // If temperature is below or equal to 24°C, turn on the heater and turn off the fan
+                handleButtonClick('button6', '/heat', 'heat'); // Heater ON
+                disableFan();
+            }
+        } 
+           
+            function disableHeater() {
+                const heaterLight = document.getElementById('heat');
+                if (heaterLight.getAttribute('src') === 'on2.jpg') {
+                    heaterLight.setAttribute('src', 'off2.jpg'); 
+                    fetch('/heat', { method: 'POST' }); 
+                }
+            }
+        
+            function disableFan() {
+                    const fanLight = document.getElementById('fan');
+                    if (fanLight.getAttribute('src') === 'on2.jpg') {
+                        fanLight.setAttribute('src', 'off2.jpg'); // Turn off fan image
+                        fetch('/fan', { method: 'POST' }); // Turn off fan
+                    }
+                }
+        */
+
+        window.WeatherPoint = {
+            "container": "weather-widget",
+            "location": {
+                "id": "I9vW"
+            },
+            "backgroundColor": "#11117a",
+            "fontColor": "#fff9da",
+            "fontFamily": "Comic Sans MS, cursive",
+            "locationLabel": "short",
+            "hourly": {
+                "enabled": true
+            }
+        };
+        function handleButtonClick(buttonId, endpoint, lightId) {
+            const lightElement = document.getElementById(lightId);
+            const currentSrc = lightElement.getAttribute('src');
+            const newSrc = currentSrc === 'off2.jpg' ? 'on2.jpg' : 'off2.jpg';
+
+            lightElement.setAttribute('src', newSrc);
+            audio.play();
+
+            fetch(endpoint, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Success:', data);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        }
+
+        // get netspeed
+        //API link for random images: https://source.unsplash.com/random?topics=nature
+
+        let startTime, endTime;
+        let imageSize = "";
+        let image = new Image();
+        let bitOutput = document.getElementById("bits");
+        let kboutput = document.getElementById("kbs");
+        let mboutput = document.getElementById("mbs");
+
+        //Gets random image from unsplash.com
+        let imageLink = "https://source.unsplash.com/random?topics=nature";
+
+        //When image loads
+        image.onload = async function () {
+            endTime = new Date().getTime();
+
+            //Get image size
+            await fetch(imageLink).then((response) => {
+                imageSize = response.headers.get("content-length");
+                calculateSpeed();
+            });
+        };
+
+        //Function to calculate speed
+        function calculateSpeed() {
+            //Time taken in seconds
+            let timeDuration = (endTime - startTime) / 1000;
+            //total bots
+            let loadedBits = imageSize * 8;
+            let speedInBps = (loadedBits / timeDuration).toFixed(2);
+            let speedInKbps = (speedInBps / 1024).toFixed(2);
+            let speedInMbps = (speedInKbps / 1024).toFixed(2);
+
+            bitOutput.innerHTML += `${speedInBps}`;
+            kboutput.innerHTML += `${speedInKbps}`;
+            mboutput.innerHTML += `${speedInMbps}`;
+        }
+
+        //Initial
+        const init = async () => {
+            startTime = new Date().getTime();
+            image.src = imageLink;
+        };
+
+        window.onload = () => init();
+
+        function onDocumentReady() {
+            // Attach event listeners to buttons
+            document.getElementById('button1').addEventListener('click', () => handleButtonClick('button1', '/light1', 'lite1'));
+            document.getElementById('button2').addEventListener('click', () => handleButtonClick('button2', '/light2', 'lite2'));
+            // document.getElementById('button3').addEventListener('click', () => handleButtonClick('button3', '/light3', 'lite3'));
+            document.getElementById('button4').addEventListener('click', () => handleButtonClick('button4', '/light4', 'lite4'));
+            document.getElementById('button5').addEventListener('click', () => handleButtonClick('button5', '/fan', 'fan'));
+            document.getElementById('button6').addEventListener('click', () => handleButtonClick('button6', '/heat', 'heat'));
+
+            fetchReadings();
+            setInterval(fetchReadings, 10000); // Update readings every 10 seconds
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .containernetspeed {
+            width: 350px;
+            background-color: #ffffff;
+            padding: 4em 2em;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 50%;
+            border-radius: 0.5em;
+            font-family: "Poppins", sans-serif;
+            font-size: 1.2em;
+            line-height: 2.2em;
+            box-shadow: 0 1.6em 2.4em rgb(40, 4, 67, 0.3);
+        }
+
+        p {
+            font-size: 400;
+            color: #747497;
+            letter-spacing: 0.02em;
+        }
+
+        span {
+            font-weight: 500;
+            color: #090931;
+        }
+
+        /* Add your CSS styles here */
+        #readings-container {
+            color: gold;
+            text-align: left;
+
+        }
+
+        label {
+            display: inline-flex;
+            color: white;
+            text-align: left;
+            flex-direction: column;
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted black;
+        }
+
+        .tooltip .tooltiptext {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip .tooltiptext::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+        .tooltip:hover .tooltiptext {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .switches-container {
+            display: -webkit-inline-flex;
+            position: relative;
+            flex-wrap: wrap;
+            height: fit-content;
+            max-height: fit-content;
+            min-height: max-content;
+            display: inline-flex;
+            width: 100%;
+            text-align: center;
+            align-content: center;
+            justify-content: center;
+        }
+
+        body {
+            display: flexbox;
+            flex-wrap: wrap;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: normal;
+            background-image: url("3d.jpg");
+            background-size: 100vw 136vh;
+            background-position: center;
+            width: 100%;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-repeat: no-repeat;
+            align-content: space-between;
+            text-align: left;
+        }
+
+        div#climateContainer {
+            width: 100%;
+            justify-content: center;
+        }
+
+        #topbannerlogo-container {
+            width: fit-content;
+            min-width: fit-content;
+            max-width: 100%;
+            display: inline-flex;
+            position: relative;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .button {
+            background-color: #000;
+            border: solid white 2px;
+            color: white;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            background-color: #1654ff;
+        }
+
+        .lightSwitch {
+            width: fit-content;
+            /* Adjust size as needed */
+            height: auto;
+        }
+
+        img#ban {
+            width: 60%;
+            min-width: fit-content;
+            max-width: fit-content;
+            display: inline-flex;
+            flex-direction: row;
+            position: relative;
+        }
+
+        #w-rydoty {
+            background-color: #11117a;
+            color: #fff9da;
+            padding: 10px;
+            font-family: Comic Sans MS, cursive;
+            position: relative;
+        }
+
+        #w-rydoty .source {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 6px;
+        }
+
+        #w-rydoty .title {
+            font-size: 15px;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        #w-rydoty .current {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-evenly;
+            flex-wrap: wrap;
+            align-items: center;
+            margin-bottom: 10px;
+            gap: 10px;
+        }
+
+        #w-rydoty .current .temp {
+            font-size: 36px;
+        }
+
+        #w-rydoty .obs {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            border-top: 1px dotted #ddd;
+            padding-top: 6px;
+        }
+
+        #w-rydoty .obs div {
+            display: flex;
+            align-items: center;
+            padding: 0 7px;
+        }
+
+        #w-rydoty .obs svg {
+            margin-right: 8px;
+        }
+
+        #w-rydoty .hourly {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+            gap: 16px;
+            overflow-x: hidden;
+            overflow-y: hidden;
+            font-size: 14px;
+            flex-wrap: nowrap;
+        }
+
+        #w-rydoty .hourly .item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #w-rydoty .hourly .item span {
+            width: 50px;
+            text-align: center;
+        }
+
+        #w-rydoty .hourly .item img {
+            margin: 6px 0;
+        }
+
+        p {
+            /* font-size: 400; */
+            color: #747497;
+            letter-spacing: 0.02em;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flexbox;
+            flex-wrap: wrap;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: normal;
+            background-image: url(3d.jpg);
+            background-size: 100vw 136vh;
+            background-position: center;
+            width: 100%;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            background-repeat: no-repeat;
+            align-content: space-between;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body <div class="container" id="topbannerlogo-container">
+    <img class="image" id="esp" src="Esp8266.png" alt="ESP8266 Logo">
+    <img class="image" id="ban" src="banner.png" alt="Banner">
+    </div>
+    &nbsp;
+    <p>
+    </p>
+    <div class="container" id="readings-container">
+        <span class="span">
+            <label id="tmp" class="label">Temperature:_ </label>
+            <div id="temperature">2.5 °C</div>
+        </span>
+        &nbsp;
+        <span class="span">
+            <label id="tmp" class="label">Humidity:_ </label>
+            <div id="humidity">0.0 %</div>
+        </span>
+    </div>
+    <p></p>
+    &nbsp;
+    <p>
+    </p>
+    <div class="container switches-container" id="switch-container">
+        <div class="tooltip">
+            <div id="lights1">
+                <button class="button" id="button1" name="light 1">
+                    <img class="lightSwitch" id="lite1" src="off2.jpg" alt="Light 1">
+                    <span class="tooltiptext">Light 1</span>
+                </button>
+
+            </div>
+        </div>
+        <div class="tooltip">
+            <div id="lights2">
+                <button class="button" id="button2" name="light 2"><img class="lightSwitch" id="lite2" src="off2.jpg"
+                        alt="Light 2">
+                    <span class="tooltiptext">Light 2</span>
+                </button>
+            </div>
+        </div>
+        <div class="tooltip">
+            <div id="lights4">
+                <button class="button" id="button4" name="light 4">
+                    <img class="lightSwitch" id="lite4" src="off2.jpg" alt="Light 4">
+                    <span class="tooltiptext">Light 4</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <p></p>
+    &nbsp;
+    <p>
+    </p>
+    <div class="container" id="climateContainer">
+        <div class="tooltip">
+            <div id="fann">
+                <button class="button" id="button5" name="fan">
+                    <img class="lightSwitch" id="fan" src="off2.jpg" alt="Fan">
+                    <span class="tooltiptext">Fan</span>
+                </button>
+
+            </div>
+        </div>
+        <div class="tooltip">
+            <div id="heater">
+                <button class="button" id="button6" name="heater">
+                    <img class="lightSwitch" id="heat" src="off2.jpg" alt="Heater">
+                    <span class="tooltiptext">Heater</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <p>
+    </p>
+    <div id="weather-widget" class="window" name="weatherwindow">
+
+        <svg xmlns="http://www.w3.org/2000/svg" width="0" height="0" aria-hidden="true">
+            <defs>
+                <symbol id="icon-humidity">
+                    <title>humidity</title>
+                    <g fill="#fff9da">
+                        <path fill-rule="evenodd"
+                            d="M17.5 8c-.7-1.3-2.4-3.3-5-6.2a.8.8 0 0 0-1 0c-2.6 2.9-4.3 5-5 6.2-2.6 4.1-2.8 8 0 10.8 3.1 3 7.9 3 11 0 2.8-2.9 2.6-6.6 0-10.8Zm-9.8.8c.7-1 2.1-2.9 4.3-5.4 2.2 2.5 3.6 4.3 4.3 5.4 2.2 3.6 2.3 6.7 0 8.9a6.1 6.1 0 0 1-8.7 0c-2.2-2.2-2-5.3.1-9Z"
+                            clip-rule="evenodd"></path>
+                        <path d="M12.7 17.3a4 4 0 0 0 2.8-3.8.8.8 0 0 0-1.5 0c0 1-.7 2-1.7 2.4a.8.8 0 0 0 .4 1.4Z">
+                        </path>
+                    </g>
+                </symbol>
+                <symbol id="icon-wind">
+                    <path fill="#fff9da"
+                        d="M6 11.5h5.688a3.75 3.75 0 1 0-1.95-6.954.75.75 0 0 0 .781 1.28A2.25 2.25 0 1 1 11.688 10L6 10.001a.75.75 0 1 0 0 1.5zM2 15h9.966a1.5 1.5 0 1 1-.779 2.782.75.75 0 0 0-.78 1.281 3 3 0 1 0 1.56-5.563H1.999A.75.75 0 1 0 2 15zm14.667-2h2.251a3 3 0 1 0-1.56-5.563.75.75 0 0 0 .781 1.28 1.5 1.5 0 1 1 .779 2.782l-2.251.001a.75.75 0 1 0 0 1.5z">
+                    </path>
+                </symbol>
+                <symbol id="icon-pressure">
+                    <g fill="#fff9da">
+                        <path
+                            d="M14.1 2.2a.8.8 0 0 1-.3 1.5A8.5 8.5 0 0 0 3.5 12a8.5 8.5 0 1 0 16.8-1.7.8.8 0 0 1 1.5-.3A10 10 0 0 1 12 22a10 10 0 1 1 2.1-19.8Z">
+                        </path>
+                        <path fill-rule="evenodd"
+                            d="M13.3 10.7c.3.2.8.2 1.1 0L18 7a.7.7 0 1 0-1-1l-3.7 3.6c-.2.3-.2.8 0 1Zm-5 5c.2.4.7.4 1 0l1.2-1.2a.7.7 0 1 0-1-1l-1.3 1.2c-.3.3-.3.8 0 1Z"
+                            clip-rule="evenodd"></path>
+                        <path fill-rule="evenodd"
+                            d="M14.8 5.8c0-.5.3-.8.7-.8h2.8a.8.8 0 0 1 0 1.5h-2.8a.8.8 0 0 1-.8-.8Z"
+                            clip-rule="evenodd"></path>
+                        <path fill-rule="evenodd"
+                            d="M17.5 5.8a.8.8 0 0 1 1.5 0v2.7a.8.8 0 0 1-1.5 0V5.7ZM9 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0Zm4.5 0a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"
+                            clip-rule="evenodd"></path>
+                    </g>
+                </symbol>
+                <symbol id="icon-logo">
+                    <path fill="#fff9da"
+                        d="M227.746 480.465a28.27 28.27 0 0 0 8.25 20.006 28.28 28.28 0 0 0 20.004 8.25c15.707 0 28.252-12.66 28.252-28.256v-62.772h-56.506v62.772zM0 266.902c16.392-6.127 36.713-9.74 58.709-9.74 35.981 0 67.455 9.74 84.688 24.195 7.227-86.468 28.49-173.302 63.215-216.562C103.488 84.486 21.84 164.617 0 266.902zM277.394 24.658c0-11.715-9.576-21.379-21.379-21.379-11.715 0-21.379 9.664-21.379 21.379V73.06c-28.219 26.082-56.268 101.08-65.162 209.942 13.426-12.314 37.113-21.465 65.162-24.543v139.133h42.758V258.459c28.137 3.164 51.824 12.229 65.25 24.629-8.98-108.864-37.029-183.946-65.25-210.028V24.658zM305.543 64.795c34.619 43.26 55.883 130.094 63.112 216.51 17.23-14.455 48.654-24.143 84.635-24.143 21.943 0 42.316 3.613 58.711 9.74C490.158 164.668 408.562 84.537 305.543 64.795z">
+                    </path>
+                </symbol>
+            </defs>
+        </svg>
+        <div id="w-rydoty">
+            <div class="source">
+                <a href="/weather/tas/meander-valley/westbury">
+                    <svg width="14" height="14" viewBox="0 0 512 512">
+                        <use href="#icon-logo"></use>
+                    </svg>
+                </a>
+            </div>
+            <div class="title">Westbury</div>
+            <div class="current">
+                <div>
+                    <span class="temp">12°C</span>
+                </div>
+                <div>
+                    <img alt="Fair" loading="lazy" width="40" height="40" decoding="async"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/mostly-fine.svg"
+                        style="color: transparent">
+                </div>
+                <div>
+                    <span class="precis">Fair</span>
+                </div>
+            </div>
+            <div class="obs">
+                <div title="Relative humidity">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                        <use href="#icon-humidity"></use>
+                    </svg>
+                    95.2%
+                </div>
+                <div title="Wind speed">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                        <use href="#icon-wind"></use>
+                    </svg>
+                    9.7 km/h
+                </div>
+                <div title="Atmospheric pressure">
+                    <svg width="16" height="16" viewBox="0 0 24 24">
+                        <use href="#icon-pressure"></use>
+                    </svg>
+                    1017 hPa
+                </div>
+            </div>
+            <div class="hourly">
+                <div class="item">
+                    <span>5 am</span>
+                    <img alt="Fair" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/mostly-fine.svg">
+                    <span>12°C</span>
+                </div>
+
+                <div class="item">
+                    <span>6 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>13°C</span>
+                </div>
+
+                <div class="item">
+                    <span>7 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>14°C</span>
+                </div>
+
+                <div class="item">
+                    <span>8 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>16°C</span>
+                </div>
+
+                <div class="item">
+                    <span>9 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>17°C</span>
+                </div>
+
+                <div class="item">
+                    <span>10 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>18°C</span>
+                </div>
+
+                <div class="item">
+                    <span>11 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>18°C</span>
+                </div>
+
+                <div class="item">
+                    <span>12 pm</span>
+                    <img alt="Drizzle" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/drizzle.svg">
+                    <span>18°C</span>
+                </div>
+
+                <div class="item">
+                    <span>1 pm</span>
+                    <img alt="Showers" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/showers-rain.svg">
+                    <span>19°C</span>
+                </div>
+
+                <div class="item">
+                    <span>2 pm</span>
+                    <img alt="Partly Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/partly-cloudy.svg">
+                    <span>21°C</span>
+                </div>
+
+                <div class="item">
+                    <span>3 pm</span>
+                    <img alt="Fair" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/mostly-fine.svg">
+                    <span>22°C</span>
+                </div>
+
+                <div class="item">
+                    <span>4 pm</span>
+                    <img alt="Fair" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/mostly-fine.svg">
+                    <span>23°C</span>
+                </div>
+
+                <div class="item">
+                    <span>5 pm</span>
+                    <img alt="Fair" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/mostly-fine.svg">
+                    <span>22°C</span>
+                </div>
+
+                <div class="item">
+                    <span>6 pm</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>21°C</span>
+                </div>
+
+                <div class="item">
+                    <span>7 pm</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>20°C</span>
+                </div>
+
+                <div class="item">
+                    <span>8 pm</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>18°C</span>
+                </div>
+
+                <div class="item">
+                    <span>9 pm</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>16°C</span>
+                </div>
+
+                <div class="item">
+                    <span>10 pm</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>16°C</span>
+                </div>
+
+                <div class="item">
+                    <span>11 pm</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>16°C</span>
+                </div>
+
+                <div class="item">
+                    <span>12 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>16°C</span>
+                </div>
+
+                <div class="item">
+                    <span>1 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>16°C</span>
+                </div>
+
+                <div class="item">
+                    <span>2 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>16°C</span>
+                </div>
+
+                <div class="item">
+                    <span>3 am</span>
+                    <img alt="Cloudy" loading="lazy" width="20"
+                        height="20"=src="https://weatherpoint.com.au/weather-icons-128/min/cloudy.svg">
+                    <span>15°C</span>
+                </div>
+
+                <div class="item">
+                    <span>4 am</span>
+                    <img alt="Partly Cloudy" loading="lazy" width="20" height="20"
+                        src="https://weatherpoint.com.au/weather-icons-128/min/partly-cloudy.svg">
+                    <span>14°C</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <p></p>
+
+    <p>
+    </p>
+    <p></p>
+</body>
+
+</html>
+

@@ -1,0 +1,7 @@
+int light1 = gpio5;	d1
+int light2 = gpio4;	d2
+int light3 = gpio3;	d5
+int light4 = gpio14;	d6
+int heat = gpio12;	d7
+int fan = gpio13;	d8
+temp-hum = gpio2;	gpio2
