@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en" class="html">
+
+<head>
+    <title>Vanduino - Pins</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css" id="tts-styles"></style>
+    <script type="text/javascript" src="jquery-3.7.1.js"></script>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        tr:hover {
+            background-color: #ddd;
+        }
+
+        .image-container {
+            text-align: center;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Function</th>
+                        <th>General Purpose Pin (GPIO)</th>
+                        <th>Digital Pin (D*)</th>
+                        <th>Working Status (?)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Light 1</td>
+                        <td>GPIO5</td>
+                        <td>D1</td>
+                        <td>Unknown</td>
+                    </tr>
+                    <tr>
+                        <td>Light 2</td>
+                        <td>GPIO4</td>
+                        <td>Unknown</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>Light 3</td>
+                        <td>GPIO14</td>
+                        <td>D5</td>
+                        <td>Unknown</td>
+                    </tr>
+                    <tr>
+                        <td>Heater</td>
+                        <td>GPIO12</td>
+                        <td>D6</td>
+                        <td>Unknown</td>
+                    </tr>
+                    <tr>
+                        <td>Fan</td>
+                        <td>GPIO13</td>
+                        <td>D7</td>
+                        <td>Unknown</td>
+                    </tr>
+                    <tr>
+                        <td>Climate Sensor (DHT11)</td>
+                        <td>GPIO2</td>
+                        <td>D4</td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="image-container">
+            <img src="vanduinopins.png" alt="Vanduino Pins" />
+        </div>
+        <button class="back-button" onclick="window.location.href='index.html'">Back to Home</button>
+    </div>
+</body>
+
+</html>
+

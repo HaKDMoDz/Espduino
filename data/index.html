@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Vanduino (v4.0)</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta charset="UTF-8">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=qr_code_2" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style type="text/css" id="tts-styles"></style>
+    <script type="text/javascript" src="jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.0.0/crypto-js.min.js"></script>
+    <script src="https://weatherpoint.com.au/widget/loader.js?id=rydoty" async=""></script>
+    <link rel="stylesheet" id="mystyleSheet" href="style.css" />
+    <script type="text/javascript" src="script.js"></script>
+
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&icon_names=fiber_pin" />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <audio id="myAudio" src="switchSound.wav" preload="auto"></audio>
+</head>
+
+<body>
+    <audio id="myAudio" src="switchSound.wav" preload="auto"> </audio>
+    <div class="w3-container w3-black" id="w3-container-modal">
+        <button onclick="document.getElementById('id01').style.display='block'"
+            class="w3-button w3-black">Schematic</button>
+        <button onclick="document.getElementById('id02').style.display='block'"
+            class="w3-button w3-black">Commands</button>
+
+        <div id="id01" class="w3-modal">
+            <div class="w3-modal-content">
+                <header class="w3-container w3-white">
+                    <span onclick="document.getElementById('id01').style.display='none'"
+                        class="w3-button w3-display-topright">&times;</span>
+                    <h2 id="modal-heading">VanDuino D1-Mini Pins</h2>
+                </header>
+                <div class="w3-container w3-white" id="w3-container-table">
+                    <table class="w3-table w3-blue">
+                        <tr>
+                            <th>Function</th>
+                            <th>Digital Pin</th>
+                            <th>GPIO Pin</th>
+
+                        </tr>
+                        <tr>
+                            <td>Light 1</td>
+                            <td>14</td>
+                            <td>05</td>
+
+                        </tr>
+                        <tr>
+                            <td>Light 2</td>
+                            <td>12</td>
+                            <td>06</td>
+
+                        </tr>
+                        <tr>
+                            <td>Light 3</td>
+                            <td>13</td>
+                            <td>07</td>
+
+                        </tr>
+                        <tr>
+                            <td>Fan</td>
+                            <td>15</td>
+                            <td>16</td>
+
+                        </tr>
+                        <tr>
+                            <td>Heater</td>
+                            <td>4</td>
+                            <td>02</td>
+
+                        </tr>
+                    </table>
+                    <table class="w3-table w3-blue">
+                        <tr>
+                            <th>Active</th>
+                            <th>Sketch:</th>
+                            <th>Version:</th>
+                            <th>Cloud-Link</th>
+                        </tr>
+                        <tr>
+                            <td>True</td>
+                            <td><a href="file://C:\Users\ryanf\OneDrive\Desktop\VanduinoV5\VanduinoV5.ino"
+                                    id="sketchLocal">Storage</a></td>
+                            <td>5.0</td>
+                            <td><a href="bit.ly" id="cloudSketch">bit.ly/?????</a></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="w3-container w3-white" id="w3-container-image">
+                    <p>
+                        <image id="pin-image" class="image" style="width:max-content; height:max-content"
+                            src="d1Mini2.png"></image>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="w3-container w3-black" id="w3-container-modal2">
+
+        <div id="id02" class="w3-modal">
+            <div class="w3-modal-content">
+                <header class="w3-container w3-white">
+                    <span onclick="document.getElementById('id02').style.display='none'"
+                        class="w3-button w3-display-topright">&times;</span>
+                    <h2 id="modal-heading">Commands Information</h2>
+                </header>
+                <div class="w3-container w3-white" id="w3-container-table-commands">
+                    <table class="w3-table w3-blue">
+                        <tr>
+                            <th>Commands</th>
+                            <th>Description</th>
+                            <th>Call Example</th>
+
+                        </tr>
+                        <tr>
+                            <td>Light 1</td>
+                            <td>Toggles Light 1 On/Off</td>
+                            <td>/light1</td>
+
+                        </tr>
+                        <tr>
+                            <td>Light 2</td>
+                            <td>Toggles Light 2 On/Off</td>
+                            <td>/light2</td>
+
+                        </tr>
+                        <tr>
+                            <td>Light 3</td>
+                            <td>Toggles Light 3 On/Off</td>
+                            <td>/light3</td>
+
+                        </tr>
+                        <tr>
+                            <td>Fan</td>
+                            <td>Toggles Fan On/Off</td>
+                            <td>/fan</td>
+
+                        </tr>
+                        <tr>
+                            <td>Heater</td>
+                            <td>Toggles Heater On/Off</td>
+                            <td>/heat</td>
+
+                        </tr>
+                        <tr>
+                            <td>Serial</td>
+                            <td>Opens Remote Serial Console</td>
+                            <td>/serial</td>
+
+                        </tr>
+                        <tr>
+                            <td>OTA</td>
+                            <td>Opens the OTA Feature Window</td>
+                            <td>/update</td>
+
+                        </tr>
+                        <tr>
+                            <td>Climate</td>
+                            <td>Gets Climate Control Readings From DHT11</td>
+                            <td>/readings</td>
+
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <audio id="myAudio" src="switchSound.wav" preload="auto"></audio>
+
+    <div class="container" id="topbannerlogo-container">
+        <img class="image" id="esp" src="Esp8266.png" alt="ESP8266 Logo">
+        <img class="image" id="ban" src="banner.png" alt="Banner">
+    </div>
+    <hr id="goldHR">
+    &nbsp;
+    <div class="container" id="readings">
+        <span class="span">
+            <span id="tmp" class="label">Temperature:_ 
+                <div id="temperature">%TEMPERATURE%</div>
+            </span>
+        &nbsp;
+            <span class="span">
+                <span id="tmp" class="label">Humidity:_ 
+                    <div id="humidity">%HUMIDITY%</div>
+                </span>
+            </span>
+        </span>
+    </div>
+        <div class="w3-card4 w3-indigo" id="pins-dropdown-container">
+            <div class="w3-container"></div>
+        </div>
+        </span>
+    </div>
+    &nbsp;
+    &nbsp;
+    <div class="w3-card4 w3-transparent w3-container" id="switchBox">
+        <a href="/fan" id="utilityitem1">
+            <div class="tooltip">
+                <div id="fann">
+                    <button class="button" id="fanButton1" name="fan">
+                        <img class="lightSwitch" id="fan" src="off2.jpg" alt="Fan">
+                        <span class="tooltiptext">Fan</span>
+                    </button>
+                </div>
+            </div>
+        </a>
+        <a href="/light1" id="utilityitem2">
+            <div class="tooltip">
+                <div id="lights1">
+                    <button class="button" id="light1Button2" name="light 1">
+                        <img class="lightSwitch" id="lite1" src="off2.jpg" alt="Light 1">
+                        <span class="tooltiptext">Light 1</span>
+                    </button>
+                </div>
+            </div>
+        </a>
+        <a href="/light2" id="utilityitem3">
+            <div class="tooltip">
+                <div id="lights2">
+                    <button class="button" id="light2Button3" name="light 2">
+                        <img class="lightSwitch" id="lite2" src="off2.jpg" alt="Light 2">
+                        <span class="tooltiptext">Light 2</span>
+                    </button>
+                </div>
+            </div>
+        </a>
+        <a href="/light3" id="utilityitem4">
+            <div class="tooltip">
+                <div id="lights3">
+                    <button class="button" id="light3Button4" name="light 3">
+                        <img class="lightSwitch" id="lite3" src="off2.jpg" alt="Light 3">
+                        <span class="tooltiptext">Light 3</span>
+                    </button>
+                </div>
+            </div>
+        </a>
+        <a href="/heat" id="itilityitem5">
+            <div class="tooltip">
+                <div id="heater">
+                    <button class="button" id="heaterButton5" name="heater">
+                        <img class="lightSwitch" id="heat" src="off2.jpg" alt="Heater">
+                        <span class="tooltiptext">Heater</span>
+                    </button>
+                </div>
+            </div>
+        </a>
+    </div>
+    &nbsp;
+    &nbsp;
+    <p>
+
+    <div id="weather-widget" class="window" name="weatherwindow"></div>
+    </p>
+    &nbsp;
+    &nbsp;
+    <p>
+    <!--  OTA Update Section
+    <div class="container wide" id="ota-container">
+        <h3>OTA Firmware Update</h3>
+        <input type="file" id="firmwareFile" accept=".bin" />
+        <button class="button" id="uploadButton" onclick="uploadFirmware()">Upload Firmware</button>
+    </div>
+    </p>
+    &nbsp;
+    &nbsp;
+    <p>
+        Remote Serial Console Section
+    <div class="container wide" id="remote-serial-container">
+
+        <h3>Remote Serial Console</h3>
+        <textarea id="area-for-remote-serial-console" rows="10" readonly></textarea>
+        <input type="text" id="commandInput" placeholder="Enter command here..." />
+        <button class="button" id="sendCommandButton" onclick="sendCommand()">Send Command</button>
+    </div>
+ -->
+    <!-- 
+    Drag and Drop Area for File Comparison
+     <div class="container" id="checksumdropcontainer">MD5 Checksum Container
+        <div id="md5-container">
+            <h3>MD5 Checksum</h3>
+            <p id="checksumResult">No checksum generated yet.</p>
+            <button onclick="generateMD5()">Generate MD5 Checksum</button>
+        </div>
+        &nbsp;<br>
+        <div id="drop-area">
+            <p>Drop a binary file here for checksum comparison</p>
+        </div>
+        <p id="comparisonResult"></p>
+    </div>
+-->
+    </p> <!-- serial-console, OTA sections -->
+</body>
+
+</html>
+
